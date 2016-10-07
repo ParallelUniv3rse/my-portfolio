@@ -1,6 +1,6 @@
 var getIndexData = function (appType){
     var data = {};
-    data.titile = appType + " application";
+    data.title = appType + " application";
     return data;
 }
 
