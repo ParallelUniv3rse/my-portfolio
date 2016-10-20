@@ -30,6 +30,9 @@ var options = {
         path: "views",
         ext: ".hbs"
     },
+    js:{
+        path: "public/js"
+    },
     styles: {
         //minify: true,
         //concat: false,
@@ -79,7 +82,7 @@ var options = {
 
 gulp.task("serve", function (callback) {
     console.log("Serving...");
-    runSequence('browser-sync', ['sass:watch', 'html:watch'],
+    runSequence('browser-sync', ['sass:watch', 'html:watch', 'js:watch'],
         callback);
 });
 
@@ -154,6 +157,9 @@ gulp.task("html:watch", function(){
     gulp.watch(options.html.path + '/**/*' + options.html.ext, ['bs-reload']);
 });
 
+gulp.task("js:watch", function(){
+    gulp.watch(options.js.path + '/**/*.js', ['bs-reload']);
+});
 
 gulp.task('bs-reload', function () {
     browserSync.reload();
