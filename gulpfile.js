@@ -1,3 +1,4 @@
+var path = require("path");
 var gulp = require('gulp');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
@@ -10,6 +11,7 @@ var reload = browserSync.reload;
 var nodeInspector = require('gulp-node-inspector');
 var runSequence = require('run-sequence');
 var nodemon = require("gulp-nodemon");
+var babel = require("gulp-babel");
 
 //TODO: implpenent concatination
 //TODO: implement gulp-inspector with nodemon
@@ -17,7 +19,7 @@ var options = {
     app: {
         nodemonOptions: {
             script: 'app.js',
-            ignore: ['public/**/*.js', 'gulpfile.js', 'node_modules/'],
+            ignore: ['public/**/*.js', 'gulpfile_production.js', 'gulpfile.js', 'node_modules/'],
             env: {
                 'NODE_ENV': 'development',
                 'DEBUG': 'appname:*'
@@ -31,7 +33,8 @@ var options = {
         ext: ".hbs"
     },
     js:{
-        path: "public/js"
+        path: "public/js",
+        es6dir: "ES6"
     },
     styles: {
         //minify: true,
@@ -40,7 +43,7 @@ var options = {
             scss: "public/stylesheets/sass",
             css: "public/stylesheets"
         },
-        autoprefixerCompatibility: 'last 2 versions',
+        autoprefixerCompatibility: ['last 3 versions', '> 1%'],
         sassOptions: {
             outputStyle: 'compressed'
             /*
@@ -82,7 +85,7 @@ var options = {
 
 gulp.task("serve", function (callback) {
     console.log("Serving...");
-    runSequence('browser-sync', ['sass:watch', 'html:watch', 'js:watch'],
+    runSequence('browser-sync', ['scripts', 'styles'], ['sass:watch', 'html:watch', 'js:watch'],
         callback);
 });
 
@@ -126,22 +129,31 @@ gulp.task('debug', function() {
         .pipe(nodeInspector());
 });
 
-gulp.task('styles', function () {
-    gulp.src([options.styles.path.scss + '/**/*.scss'])
+gulp.task('styles', function (cb) {
+    gulp.src([path.join(options.styles.path.scss, '/**/*.scss')])
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(sass(options.styles.sassOptions).on('error', sass.logError))
-        .pipe(autoprefixer(options.styles.autoprefixerCompatibility))
+        .pipe(autoprefixer({ browsers: options.styles.autoprefixerCompatibility}))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(options.styles.path.css))
         //.pipe(browserSync.reload({stream:true})) --- ERR: reloads whole page because of the .map files
         .pipe(browserSync.stream({match: '**/*.css'}));
+    cb();
 });
 
-//gulp.task('default', ['browser-sync'], function(){
-//    gulp.watch("public/stylesheets/sass/**/*.scss", ['styles']);
-//    gulp.watch("*.html", ['bs-reload']);
-//});
+gulp.task('scripts', function (cb) {
+    gulp.src([path.join(options.js.path, options.js.es6dir, '/**/*.js')])
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(options.js.path));
+    reload();
+    cb();
+});
 
 gulp.task("default", ["serve"]);
 
@@ -150,15 +162,15 @@ gulp.task("default", ["serve"]);
  **/
 
 gulp.task('sass:watch', function () {
-    gulp.watch(options.styles.path.scss + '/**/*.scss', ['styles']);
+    gulp.watch([path.join(options.styles.path.scss , '/**/*.scss')], ['styles']);
 });
 
 gulp.task("html:watch", function(){
-    gulp.watch(options.html.path + '/**/*' + options.html.ext, ['bs-reload']);
+    gulp.watch([path.join(options.html.path, '/**/*' + options.html.ext)], ['bs-reload']);
 });
 
 gulp.task("js:watch", function(){
-    gulp.watch(options.js.path + '/**/*.js', ['bs-reload']);
+    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], ['bs-reload']);
 });
 
 gulp.task('bs-reload', function () {

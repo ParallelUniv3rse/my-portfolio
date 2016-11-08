@@ -1,9 +1,9 @@
 {
-  "name": "BringBackTheSChasis",
-  "version": "0.0.0",
+  "name": "ProjectName",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
   "dependencies": {
     "body-parser": "~1.15.1",
@@ -11,20 +11,23 @@
     "debug": "~2.2.0",
     "express": "~4.13.4",
     "gulp-node-inspector": "^0.1.0",
+    "handlebars-helpers": "^0.7.5",
     "hbs": "~4.0.0",
     "morgan": "~1.7.0",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "gulp-nodemon": "^2.2.1",
+    "gulp": "^3.9.1",
+    "babel-preset-es2015": "^6.16.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-autoprefixer": "^3.1.1",
+    "run-sequence": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-plumber": "^1.1.0"
   },
   "devDependencies": {
     "browser-sync": "^2.17.0",
-    "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^3.1.1",
     "gulp-concat": "^2.6.0",
-    "gulp-nodemon": "^2.2.1",
-    "gulp-plumber": "^1.1.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-sass": "^2.3.2",
-    "gulp-sourcemaps": "^1.6.0",
-    "run-sequence": "^1.2.2"
+    "gulp-rename": "^1.2.2"
   }
 }
