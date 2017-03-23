@@ -82,7 +82,7 @@ html, body {
         min-width: calc(100vw - 116px);
         min-height: calc(100vh - 116px);
         background-color: $red;
-        #name {
+        .content-default{
           opacity: 0;
           transition: opacity 0.5s;
           transition-delay: 0s;
@@ -118,18 +118,23 @@ html, body {
     }
     #name {
       margin: 0;
-      margin-bottom: 0;
       font-family: 'Lato', sans-serif;
       font-weight: 400;
-      opacity: 1;
-      transition: opacity 0.5s;
-      transition-delay: 0.5s;
     }
     #profession {
       font-family: 'Lato', sans-serif;
       font-style: italic;
       font-size: 1.2em;
       font-weight: 300;
+    }
+    .content-default{
+      opacity: 1;
+      transition: opacity 0.5s;
+      transition-delay: 0.5s;
+      .hint{
+        font-size: 0.8em;
+        color: #cccccc;
+      }
     }
     .content-hover {
       opacity: 0;
