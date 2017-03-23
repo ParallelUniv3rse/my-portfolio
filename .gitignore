@@ -2,5 +2,5 @@ node_modules
 .idea
 **/.DS_Store
 **/.sass-cache
-public/stylesheets/style.css
-public/stylesheets/style.css.map
+public/stylesheets/*.css
+public/stylesheets/*.css.map

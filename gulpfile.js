@@ -8,7 +8,6 @@ var sourcemaps = require('gulp-sourcemaps');
 var concat = require('gulp-concat');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-var nodeInspector = require('gulp-node-inspector');
 var runSequence = require('run-sequence');
 var nodemon = require("gulp-nodemon");
 var babel = require("gulp-babel");

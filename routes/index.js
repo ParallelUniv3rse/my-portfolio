@@ -2,10 +2,25 @@ var express = require('express');
 var router = express.Router();
 var path = require('path');
 var indexModel = require(path.join(__dirname, "../models/index.js"));
+
 /* GET home page. */
-console.log(indexModel.getIndexData("Express"));
 router.get('/', function(req, res, next) {
-  res.render('index', indexModel.getIndexData("Express"));
+  res.render('index', {});
+});
+
+/* GET about page. */
+router.get('/whoTheHell', function(req, res, next) {
+  res.render('about', {});
+});
+
+/* GET inspirations page. */
+router.get('/isInspired', function(req, res, next) {
+  res.render('inspirations', {});
+});
+
+/* GET goals page. */
+router.get('/hasGoals', function(req, res, next) {
+  res.render('goals', {});
 });
 
 module.exports = router;
