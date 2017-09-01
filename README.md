@@ -1,8 +1,7 @@
-# ProjectName
+# arnostneurad.com - my personal website
 
 ### Setup:
 
- * Clone this repository from https://gitlab.com/unchained/<ProjectName>.git
  * Run `sudo npm install -g gulp` (if not installed)
  * ------FOR DEVELOPMENT------
  * Run `npm install` in the project root dir
@@ -14,4 +13,4 @@
   * Run `gulp --gulpfile gulpfile_production.js` in the project root dir
 ### Requirements:
 
- * Node.js `>=4.2.6`
+ * Node.js `>=7`
