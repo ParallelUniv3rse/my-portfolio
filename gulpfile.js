@@ -8,12 +8,10 @@ var sourcemaps = require('gulp-sourcemaps');
 var concat = require('gulp-concat');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-var runSequence = require('run-sequence');
 var nodemon = require("gulp-nodemon");
 var babel = require("gulp-babel");
 
-//TODO: implpenent concatination
-//TODO: implement gulp-inspector with nodemon
+//TODO: implement webpacking &it's optimization
 var options = {
     app: {
         nodemonOptions: {
@@ -31,7 +29,7 @@ var options = {
         path: "views",
         ext: ".hbs"
     },
-    js:{
+    js: {
         path: "public/js",
         es6dir: "ES6"
     },
@@ -49,23 +47,23 @@ var options = {
              ------- nested:(indented like scss)-------
 
              .widget-social {
-                text-align: right; }
-                .widget-social a,
-                .widget-social a:visited {
-                    padding: 0 3px;
-                    color: #222222;
-                    color: rgba(34, 34, 34, 0.77); }
+             text-align: right; }
+             .widget-social a,
+             .widget-social a:visited {
+             padding: 0 3px;
+             color: #222222;
+             color: rgba(34, 34, 34, 0.77); }
 
              ------- expanded:(classic css) -------
 
              .widget-social {
-                text-align: right;
+             text-align: right;
              }
              .widget-social a,
              .widget-social a:visited {
-                padding: 0 3px;
-                color: #222222;
-                color: rgba(34, 34, 34, 0.77);
+             padding: 0 3px;
+             color: #222222;
+             color: rgba(34, 34, 34, 0.77);
              }
 
              ------- compact -------
@@ -82,21 +80,17 @@ var options = {
 };
 
 
-gulp.task("serve", function (callback) {
-    console.log("Serving...");
-    runSequence('browser-sync', ['scripts', 'styles'], ['sass:watch', 'html:watch', 'js:watch'],
-        callback);
-});
+gulp.task("serve", gulp.series(nm, bs, gulp.parallel(scripts, styles), watch));
 
-gulp.task('browser-sync', ['nodemon'], function (cb) {
+function bs(cb) {
     browserSync({
         proxy: "http://localhost:" + options.app.port,
         port: options.app["bs-port"],
         notify: true
     });
     cb();
-});
-gulp.task('nodemon', function (cb) {
+};
+function nm(cb) {
     var called = false;
     var server = nodemon(options.app.nodemonOptions);
     server.on('start', function () {
@@ -109,7 +103,7 @@ gulp.task('nodemon', function (cb) {
         console.log('restarted!');
         //TODO: is this delay needed?
         setTimeout(function () {
-            reload({ stream: false });
+            reload({stream: false});
         }, 1000);
     });
     server.on('crash', function () {
@@ -121,57 +115,48 @@ gulp.task('nodemon', function (cb) {
     //    process.exit();
     //});
     return server;
-});
+};
 
-gulp.task('debug', function() {
-    gulp.src([])
-        .pipe(nodeInspector());
-});
-
-gulp.task('styles', function (cb) {
+function styles(cb) {
     gulp.src([path.join(options.styles.path.scss, '/**/*.scss')])
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(sass(options.styles.sassOptions).on('error', sass.logError))
-        .pipe(autoprefixer({ browsers: options.styles.autoprefixerCompatibility}))
+        .pipe(autoprefixer({browsers: options.styles.autoprefixerCompatibility}))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(options.styles.path.css))
         //.pipe(browserSync.reload({stream:true})) --- ERR: reloads whole page because of the .map files
         .pipe(browserSync.stream({match: '**/*.css'}));
     cb();
-});
+};
 
-gulp.task('scripts', function (cb) {
+function scripts(cb) {
     gulp.src([path.join(options.js.path, options.js.es6dir, '/**/*.js')])
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
-            presets: ['es2015']
+            presets: ['env']
         }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(options.js.path));
     reload();
     cb();
-});
+};
 
-gulp.task("default", ["serve"]);
+gulp.task("default", gulp.parallel("serve"));
 
 /**
  * HELPER TASKS
  **/
 
-gulp.task('sass:watch', function () {
-    gulp.watch([path.join(options.styles.path.scss , '/**/*.scss')], ['styles']);
-});
+function watch(cb){
+    gulp.watch([path.join(options.styles.path.scss, '/**/*.scss')], gulp.parallel(styles));
+    gulp.watch([path.join(options.html.path, '/**/*' + options.html.ext)], gulp.parallel(bsReload));
+    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], gulp.parallel(bsReload));
+    cb();
+}
 
-gulp.task("html:watch", function(){
-    gulp.watch([path.join(options.html.path, '/**/*' + options.html.ext)], ['bs-reload']);
-});
-
-gulp.task("js:watch", function(){
-    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], ['bs-reload']);
-});
-
-gulp.task('bs-reload', function () {
+function bsReload(cb) {
     browserSync.reload();
-});
+    cb();
+};
