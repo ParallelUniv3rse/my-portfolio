@@ -9,24 +9,35 @@
     "body-parser": "^1.17.2",
     "cookie-parser": "~1.4.3",
     "debug": "^2.6.8",
+    "ejs": "^2.5.7",
     "express": "^4.15.4",
+    "express-ejs-layouts": "^2.3.1",
     "handlebars-helpers": "^0.8.4",
     "hbs": "~4.0.0",
     "morgan": "^1.8.2",
-    "serve-favicon": "^2.4.3"
+    "serve-favicon": "^2.4.3",
+    "socket.io": "^2.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "browser-sync": "^2.18.13",
     "gulp": "github:gulpjs/gulp#4.0",
-    "gulp-concat": "^2.6.0",
-    "gulp-rename": "^1.2.2",
     "gulp-autoprefixer": "^3.1.1",
-    "gulp-babel": "^6.1.2",
     "gulp-nodemon": "^2.2.1",
     "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
-    "gulp-sourcemaps": "^2.6.1"
+    "gulp-sourcemaps": "^2.6.1",
+    "jbone": "^1.2.0",
+    "normalize.css": "^7.0.0",
+    "reqwest": "^2.0.5",
+    "rxjs": "^5.4.3",
+    "webpack": "^3.5.5",
+    "webpack-bundle-analyzer": "^2.9.0",
+    "webpack-stream": "^4.0.0"
   }
 }

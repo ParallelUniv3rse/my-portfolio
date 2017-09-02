@@ -1,15 +1,25 @@
 'use strict';
-class Main{
+
+const $ = require('jbone');
+const Ajax = require("reqwest");
+import { Observable} from 'rxjs/Observable';
+import io from 'socket.io-client';
+
+
+class Client {
+    socket;
     
-    constructor(){
+    constructor(socketUrl) {
+        this.socket = io.connect(socketUrl);
         this.init();
     }
 
-    init(){
-
+    init() {
+        let _this = this;
+        this.socket.on('news', function (data) {
+            console.log(data);
+            _this.socket.emit('my other event', { my: 'data' });
+        });
     }
 }
-
-$(document).ready(function () {
-    var instance = new Main();
-});
+var instance = new Client('http://localhost:3000');

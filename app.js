@@ -1,4 +1,5 @@
 var express = require('express');
+var expressLayouts = require('express-ejs-layouts');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -10,14 +11,17 @@ var routes = require('./routes/index');
 
 var app = express();
 var http = require('http');
+var server = http.createServer(app);
+var io = require('socket.io')(server);
+
 
 var PORT = 3000;
 
 // view engine setup
 //TODO: enable strict mode
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
-
+app.set('view engine', 'ejs');
+app.use(expressLayouts);
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev')); // logging incoming requests to console
@@ -60,7 +64,14 @@ app.use(function (err, req, res, next) {
     });
 });
 
-app.listen(3000, function () {
+io.on('connection', function (socket) {
+    socket.emit('news', { hello: 'world' });
+    socket.on('my other event', function (data) {
+        console.log(data);
+    });
+});
+
+server.listen(PORT, function () {
     console.log('App running on port ' + PORT + "...");
 });
 
