@@ -1,41 +1,40 @@
-var path = require("path");
-var gulp = require('gulp');
-var plumber = require('gulp-plumber');
-var rename = require('gulp-rename');
-var autoprefixer = require('gulp-autoprefixer');
-var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
-var concat = require('gulp-concat');
-var browserSync = require('browser-sync');
-var reload = browserSync.reload;
-var nodemon = require("gulp-nodemon");
-var babel = require("gulp-babel");
+let path = require("path"),
+    gulp = require('gulp'),
+    plumber = require('gulp-plumber'),
+    rename = require('gulp-rename'),
+    autoprefixer = require('gulp-autoprefixer'),
+    sass = require('gulp-sass'),
+    sourcemaps = require('gulp-sourcemaps'),
+    browserSync = require('browser-sync'),
+    reload = browserSync.reload,
+    nodemon = require("gulp-nodemon"),
+    webpack = require("webpack-stream");
 
 //TODO: implement webpacking &it's optimization
 var options = {
     app: {
         nodemonOptions: {
             script: 'app.js',
-            ignore: ['public/**/*.js', 'gulpfile_production.js', 'gulpfile.js', 'node_modules/'],
+            ignore: ['public/**/*.js', 'gulpfile_production.js', 'gulpfile.js', 'webpack.config.js', 'node_modules/'],
             env: {
                 'NODE_ENV': 'development',
                 'DEBUG': 'appname:*'
             }
         },
         port: 3000, // local node app port
-        "bs-port": 5000, // use *different* port than above
+        "bs-port": 4000, // use *different* port than above
     },
     html: {
         path: "views",
-        ext: ".hbs"
+        ext: ".ejs"
     },
     js: {
         path: "public/js",
-        es6dir: "ES6"
+        es6dir: "ES6",
+        entryFile: "main.js"
     },
     styles: {
         //minify: true,
-        //concat: false,
         path: {
             scss: "public/stylesheets/sass",
             css: "public/stylesheets"
@@ -131,17 +130,14 @@ function styles(cb) {
 };
 
 function scripts(cb) {
-    gulp.src([path.join(options.js.path, options.js.es6dir, '/**/*.js')])
+    gulp.src([path.join(options.js.path, options.js.es6dir, options.js.entryFile)])
         .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(babel({
-            presets: ['env']
-        }))
-        .pipe(sourcemaps.write('.'))
+        .pipe(webpack(require('./webpack.config.js'), require("webpack")))
         .pipe(gulp.dest(options.js.path));
     reload();
     cb();
 };
+
 
 gulp.task("default", gulp.parallel("serve"));
 
@@ -149,14 +145,14 @@ gulp.task("default", gulp.parallel("serve"));
  * HELPER TASKS
  **/
 
-function watch(cb){
+function watch(cb) {
     gulp.watch([path.join(options.styles.path.scss, '/**/*.scss')], gulp.parallel(styles));
     gulp.watch([path.join(options.html.path, '/**/*' + options.html.ext)], gulp.parallel(bsReload));
-    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], gulp.parallel(bsReload));
+    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], gulp.parallel(scripts));
     cb();
 }
 
 function bsReload(cb) {
-    browserSync.reload();
+    reload();
     cb();
 };

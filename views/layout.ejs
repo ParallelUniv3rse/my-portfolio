@@ -4,13 +4,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{title}}</title>
+    <title><%= locals.title %></title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300|Ubuntu:300,400' />
     <link rel='stylesheet' href='/static/stylesheets/style.css' />
 </head>
 
 <body>
     <div id="content">
-        {{{body}}}
+        <%- body %>
         <nav id="navigation">
             <ul class="menu">
                 <li><a href="/">Home</a></li>
@@ -20,8 +21,7 @@
             </ul>
         </nav>
     </div>
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
-    <script src="/static/js/main.js"></script>
+    <script src="/static/js/client.js"></script>
 </body>
 
 </html>
