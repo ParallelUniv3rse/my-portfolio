@@ -10,7 +10,6 @@ let path = require("path"),
     nodemon = require("gulp-nodemon"),
     webpack = require("webpack-stream");
 
-//TODO: implement webpacking &it's optimization
 var options = {
     app: {
         nodemonOptions: {
@@ -41,6 +40,9 @@ var options = {
         },
         autoprefixerCompatibility: ['last 3 versions', '> 1%'],
         sassOptions: {
+            includePaths: [
+                'node_modules/normalize.css'
+            ],
             outputStyle: 'compressed'
             /*
              ------- nested:(indented like scss)-------
@@ -129,13 +131,11 @@ function styles(cb) {
     cb();
 };
 
-function scripts(cb) {
-    gulp.src([path.join(options.js.path, options.js.es6dir, options.js.entryFile)])
+function scripts() {
+    return gulp.src([path.join(options.js.path, options.js.es6dir, options.js.entryFile)])
         .pipe(plumber())
         .pipe(webpack(require('./webpack.config.js'), require("webpack")))
         .pipe(gulp.dest(options.js.path));
-    reload();
-    cb();
 };
 
 
@@ -148,7 +148,7 @@ gulp.task("default", gulp.parallel("serve"));
 function watch(cb) {
     gulp.watch([path.join(options.styles.path.scss, '/**/*.scss')], gulp.parallel(styles));
     gulp.watch([path.join(options.html.path, '/**/*' + options.html.ext)], gulp.parallel(bsReload));
-    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], gulp.parallel(scripts));
+    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], gulp.series(scripts, bsReload));
     cb();
 }
 

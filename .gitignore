@@ -4,3 +4,4 @@ node_modules
 **/.sass-cache
 public/stylesheets/*.css
 public/stylesheets/*.css.map
+/webpackReport.html

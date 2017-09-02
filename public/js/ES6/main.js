@@ -1,24 +1,25 @@
 'use strict';
-var $ = require('jbone');
+
+const $ = require('jbone');
 const Ajax = require("reqwest");
 import { Observable} from 'rxjs/Observable';
 import io from 'socket.io-client';
 
-class Main {
 
-    constructor() {
+class Client {
+    socket;
+    
+    constructor(socketUrl) {
+        this.socket = io.connect(socketUrl);
         this.init();
-        let that = "wtf";
-        that = "wtf again";
     }
 
     init() {
-        $('body').addClass("green");
-        var socket = io.connect('http://localhost:3000');
-        socket.on('news', function (data) {
+        let _this = this;
+        this.socket.on('news', function (data) {
             console.log(data);
-            socket.emit('my other event', { my: 'data' });
+            _this.socket.emit('my other event', { my: 'data' });
         });
     }
 }
-var instance = new Main();
+var instance = new Client('http://localhost:3000');
