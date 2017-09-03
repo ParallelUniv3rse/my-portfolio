@@ -1,0 +1,53 @@
+.links {
+  li {
+    a {
+      position: relative;
+      &:after {
+        position: absolute;
+        bottom: 0;
+        background: $red;
+        content: " ";
+        display: block;
+        transition: width 0.3s, height 0.3s;
+        left: 0;
+      }
+    }
+    &:not(:first-child):not(:last-child) {
+      a:after {
+        height: 1px;
+        width: 0;
+      }
+    }
+    &:first-child {
+      a:after {
+        width: 1px;
+        height: 0;
+      }
+    }
+    &:last-child {
+      a:after {
+        width: 1px;
+        height: 0;
+        left: auto;
+        right: 0;
+      }
+    }
+    &:hover {
+      &:not(:first-child):not(:last-child) {
+        a:after {
+          width: 100%;
+        }
+      }
+      &:first-child {
+        a:after {
+          height: 100%;
+        }
+      }
+      &:last-child {
+        a:after {
+          height: 100%;
+        }
+      }
+    }
+  }
+}
