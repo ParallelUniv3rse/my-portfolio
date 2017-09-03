@@ -6,22 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#cc2336">
     <title><%= locals.title %></title>
-    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300|Ubuntu:300,400' />
-    <link rel='stylesheet' href='/static/stylesheets/style.css' />
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300|Ubuntu:300,400'/>
+    <link rel='stylesheet' href='/static/stylesheets/style.css'/>
 </head>
 
 <body>
-    <div id="content">
+<main>
+    <div id="content" class="<%-defineContent('noHover')%>">
         <%- body %>
-        <nav id="navigation">
-            <ul class="menu">
-                <li><a href="/">Home</a></li>
-                <li><a href="/whoTheHell">Who the hell is this guy?</a></li>
-                <li><a href="/isInspired">Inspiration</a></li>
-                <li><a href="/hasGoals">Goals</a></li>
-            </ul>
-        </nav>
     </div>
-    <script type="text/javascript" src="/static/js/client.js"></script>
+</main>
+<footer>
+    <nav class="navigation">
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/whoTheHell">Who the hell is this guy?</a></li>
+            <li><a href="/isInspired">Inspiration</a></li>
+            <li><a href="/hasGoals">Goals</a></li>
+        </ul>
+    </nav>
+</footer>
+<script type="text/javascript" src="/static/js/client.js"></script>
 </body>
 </html>
