@@ -1,7 +1,5 @@
+.DS_Store
+.sass_cache
 node_modules
 .idea
-**/.DS_Store
-**/.sass-cache
-public/stylesheets/*.css
-public/stylesheets/*.css.map
-/webpackReport.html
+/dist/
