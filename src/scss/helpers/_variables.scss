@@ -2,33 +2,15 @@
 $red: #cc2336;
 
 // 2. Typography
-
+$font-size-base: 16px;
 $line-height: 1.5;
 $font-sizes: (
-  h1: (
-    xs: 2rem,
-    md: 3rem,
-  ),
-  h2: (
-    xs: 1.625rem,
-    md: 2.25rem,
-  ),
-  h3: (
-    xs: 1.375rem,
-    md: 1.75rem,
-  ),
-  h4:(
-    xs: 1.125rem,
-    md: 1.125rem,
-  ),
-  h5:(
-    xs: 1rem,
-    md: 1rem,
-  ),
-  h6: (
-    xs: 1rem,
-    md: 1rem,
-  )
+  h1: 2.625rem,
+  h2: 2rem,
+  h3: 1.5rem,
+  h4: 1.25rem,
+  h5: 1rem,
+  h6: 0.85rem,
 );
 
 // 3. Grid
@@ -46,3 +28,14 @@ $content-max-widths: (
   md: 50vw
 );
 
+// 4. Animation
+
+$easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+$duration-default: 200ms;
+
+// 5. Positioning
+
+$z-index: (
+  navigation: 999,
+  rippler-container: 998
+);

@@ -79,7 +79,7 @@ class Flow extends GulpClass {
    * Runs everything we need to do with JS.
    */
   scripts() {
-    return gulp.src([path.join(gulpOptions.js.src)])
+    return gulp.src([path.join(gulpOptions.js.src, gulpOptions.js.entryFile)])
       .pipe(gulpPlugins.plumber())
       .pipe(gulpPlugins.named())
       .pipe(gulpPlugins.webpack(require('./config/webpack.config.js')({

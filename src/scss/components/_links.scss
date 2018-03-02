@@ -1,51 +1,88 @@
-.links {
+.links--hover-red {
   li {
     a {
       position: relative;
-      &:after {
+      display: inline-block;
+      padding: 1rem;
+      text-decoration: none;
+
+      &::after {
+        content: "";
         position: absolute;
-        bottom: 0;
-        background: $red;
-        content: " ";
         display: block;
-        transition: width 0.3s, height 0.3s;
+        top: 0;
         left: 0;
-      }
-    }
-    &:not(:first-child):not(:last-child) {
-      a:after {
-        height: 1px;
         width: 0;
+        transition: width $duration-default $easing-default;
+        height: 1px;
+        background: $red;
       }
-    }
-    &:first-child {
-      a:after {
-        width: 1px;
-        height: 0;
-      }
-    }
-    &:last-child {
-      a:after {
-        width: 1px;
-        height: 0;
-        left: auto;
-        right: 0;
-      }
-    }
-    &:hover {
-      &:not(:first-child):not(:last-child) {
-        a:after {
+
+      &:hover {
+        &::after {
           width: 100%;
         }
       }
-      &:first-child {
-        a:after {
-          height: 100%;
+    }
+  }
+
+  &--side-ends {
+    li {
+      a {
+        position: relative;
+
+        &::after {
+          position: absolute;
+          bottom: 0;
+          background: $red;
+          content: "";
+          display: block;
+          transition: width 0.3s, height 0.3s;
+          left: 0;
         }
       }
+
+      &:first-child {
+        a:after {
+          width: 1px;
+          height: 0;
+        }
+      }
+
       &:last-child {
         a:after {
-          height: 100%;
+          width: 1px;
+          height: 0;
+          left: auto;
+          right: 0;
+        }
+      }
+
+      &:not(:first-child):not(:last-child) {
+        a:after {
+          height: 1px;
+          width: 0;
+        }
+
+      }
+
+      &:hover {
+        &:first-child {
+          a::after {
+            height: 100%;
+          }
+        }
+
+        &:last-child {
+          a::after {
+            height: 100%;
+          }
+        }
+
+        &:not(:first-child):not(:last-child) {
+          a::after {
+            width: 100%;
+          }
         }
       }
     }
