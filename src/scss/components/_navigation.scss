@@ -3,32 +3,16 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  text-align: center;
-  //background-color: white;
-  ul {
-    display: inline-block;
-    li {
-      a {
-        position: relative;
-        text-decoration: none;
-        display: inline-block;
-        &:after {
-          position: absolute;
-          content: "";
-          display: block;
-          top: 0;
-          left: 0;
-          width: 0;
-          transition: width 0.3s;
-          height: 1px;
-          background: $red;
-        }
-        &:hover {
-          &:after {
-            width: 100%;
-          }
-        }
-      }
-    }
+  z-index: zindex(navigation);
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+
+  @include media-breakpoint-down(sm) {
+    width: 100vh;
+    transform: rotateZ(-90deg) translateY(100%);
+    transform-origin: left bottom;
   }
 }

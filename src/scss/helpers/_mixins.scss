@@ -1,15 +1,18 @@
 @function breakpoint-next($name, $breakpoints: $breakpoints, $breakpoint-names: map-keys($breakpoints)) {
   $n: index($breakpoint-names, $name);
+
   @return if($n < length($breakpoint-names), nth($breakpoint-names, $n + 1), null);
 }
 
 @function breakpoint-min($name, $breakpoints: $breakpoints) {
   $min: map-get($breakpoints, $name);
+
   @return if($min != 0, $min, null);
 }
 
 @function breakpoint-max($name, $breakpoints: $breakpoints) {
   $next: breakpoint-next($name, $breakpoints);
+
   @return if($next, breakpoint-min($next, $breakpoints) - 1px, null);
 }
 
@@ -64,17 +67,19 @@
 }
 
 @mixin generate-type-sizes() {
-  @each $heading-size, $breakpoints in $font-sizes {
-    @each $breakpoint, $size in $breakpoints {
-      @include media-breakpoint-up($breakpoint) {
-        #{$heading-size}, .#{$heading-size} {
-          font-size: $size;
-        }
-      }
+  @each $heading-size, $size in $font-sizes {
+    #{$heading-size},
+    .#{$heading-size} {
+      font-size: $size;
+      margin-top: 0;
     }
   }
 }
 
 @function columns($n, $base: 100vh) {
   @return ($base / 12) * $n;
+}
+
+@function zindex($name) {
+  @return map_get($z-index, $name);
 }
