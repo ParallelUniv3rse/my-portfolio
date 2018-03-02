@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#cc2336">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon/favicon.ico">
+    <title>Arnost Neurad | <%- title %></title>
+    <meta name="description" content="I am a freelance frontend web developer and UX engineer currently in Aarhus, Denmark">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300|Ubuntu:300,400'/>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-<%= pageName %>">
+<main>
+    <div id="content" class="<%- defineContent('noHover') %>">
+        <%- body %>
+    </div>
+</main>
+<% include ../components/footer %>
+<%- defineContent('block__scripts') %>
+<script src="/js/client.js"></script>
+</body>
+</html>

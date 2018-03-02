@@ -1,158 +1,195 @@
-let path = require("path"),
-    gulp = require('gulp'),
-    plumber = require('gulp-plumber'),
-    rename = require('gulp-rename'),
-    autoprefixer = require('gulp-autoprefixer'),
-    sass = require('gulp-sass'),
-    sourcemaps = require('gulp-sourcemaps'),
-    browserSync = require('browser-sync'),
-    reload = browserSync.reload,
-    nodemon = require("gulp-nodemon"),
-    webpack = require("webpack-stream");
+const path = require('path'),
+  del = require('del'),
+  chalk = require('chalk'),
+  dedent = require('dedent-js'),
+  gulp = require('gulp'),
+  GulpClass = require('classy-gulp'),
 
-var options = {
-    app: {
-        nodemonOptions: {
-            script: 'app.js',
-            ignore: ['public/**/*.js', 'gulpfile_production.js', 'gulpfile.js', 'webpack.config.js', 'node_modules/'],
-            env: {
-                'NODE_ENV': 'development',
-                'DEBUG': 'appname:*'
-            }
-        },
-        port: 3000, // local node app port
-        "bs-port": 4000, // use *different* port than above
+  /**
+   * Gulp plugins starting with "gulp-<name>" are loaded automatically under gulpPlugins.<name>
+   *     You can rename them or call functions on required plugins via options object passed to gulp-load-plugins:
+   *     {
+     *     rename: {},
+     *     postRequireTransforms: {}
+     *     }
+   * Others are manually appended via the second array.
+   */
+  gulpPlugins = {
+    ...require('gulp-load-plugins')(),
+    ...{
+      browserSync: require('browser-sync').create(),
+      webpack: require('webpack-stream'),
+      yargs: require('yargs'),
+      /**
+       * enables us to define webpack entry points via gulp.src
+       */
+      named: require('vinyl-named'),
     },
-    html: {
-        path: "views",
-        ext: ".ejs"
+  },
+  gulpOptions = {
+    ...require('./config/gulp.config'),
+    ...{
+      production: !!(gulpPlugins.yargs.argv.production),
+      analyzeWebpack: !!(gulpPlugins.yargs.argv.analyze),
     },
-    js: {
-        path: "public/js",
-        es6dir: "ES6",
-        entryFile: "main.js"
-    },
-    styles: {
-        //minify: true,
-        path: {
-            scss: "public/stylesheets/sass",
-            css: "public/stylesheets"
-        },
-        autoprefixerCompatibility: ['last 3 versions', '> 1%'],
-        sassOptions: {
-            includePaths: [
-                'node_modules/normalize.css'
-            ],
-            outputStyle: 'compressed'
-            /*
-             ------- nested:(indented like scss)-------
+  };
 
-             .widget-social {
-             text-align: right; }
-             .widget-social a,
-             .widget-social a:visited {
-             padding: 0 3px;
-             color: #222222;
-             color: rgba(34, 34, 34, 0.77); }
+class Flow extends GulpClass {
+  constructor() {
+    super();
+    /**
+     * A friendly greeting for you, you beautiful ;)
+     */
+    console.log(chalk.blue(dedent(`
+        * Hey! I'm gulp. ༼つಠ益ಠ༽つ ─=≡ΣO))
+        * Your personal workflow magician.
+        `)));
+  }
 
-             ------- expanded:(classic css) -------
+  defineTasks() {
+    /**
+     * All tasks which are accessible via "gulp <taskName>" are defined here.
+     */
+    return {
+      build: gulp.series(this.clean, gulp.parallel(this.copyFiles, this.styles, this.scripts)),
+      nodemon: gulp.series(this.server),
+      server: gulp.series(this.server, this.startBrowserSync, (done) => {
+        done();
+      }),
+      deploy: gulp.series('build'),
+      default: gulp.series('build', 'server', this.watch),
+    };
+  }
 
-             .widget-social {
-             text-align: right;
-             }
-             .widget-social a,
-             .widget-social a:visited {
-             padding: 0 3px;
-             color: #222222;
-             color: rgba(34, 34, 34, 0.77);
-             }
+  /**
+   * Runs everything we need to do with CSS.
+   */
+  styles() {
+    return gulp.src([path.join(gulpOptions.styles.path.scss, '/**/*.scss')])
+      .pipe(gulpPlugins.plumber())
+      .pipe(gulpPlugins.sourcemaps.init())
+      .pipe(gulpPlugins.sass(gulpOptions.styles.sassOptions).on('error', gulpPlugins.sass.logError))
+      .pipe(gulpPlugins.autoprefixer({ browsers: gulpOptions.styles.autoprefixerCompatibility }))
+      .pipe(gulpPlugins.sourcemaps.write('.'))
+      .pipe(gulp.dest(gulpOptions.styles.path.css))
+      .pipe(gulpPlugins.browserSync.stream({ match: '**/*.{css|map}' }));
+  }
 
-             ------- compact -------
+  /**
+   * Runs everything we need to do with JS.
+   */
+  scripts() {
+    return gulp.src([path.join(gulpOptions.js.src)])
+      .pipe(gulpPlugins.plumber())
+      .pipe(gulpPlugins.named())
+      .pipe(gulpPlugins.webpack(require('./config/webpack.config.js')({
+        environment: gulpOptions.production ? 'production' : 'development',
+        analyze: gulpOptions.analyzeWebpack,
+      })))
+      .pipe(gulp.dest(gulpOptions.js.dist));
+  }
 
-             .widget-social { text-align: right; }
-             .widget-social a, .widget-social a:visited { padding: 0 3px; color: #222222; color: rgba(34, 34, 34, 0.77); }
 
-             ------- compressed:(minified) -------
+  copyFiles() {
+    return gulp.src(gulpOptions.copyFiles, { base: 'src' })
+      .pipe(gulp.dest('dist'));
+  }
 
-             .widget-social{text-align:right}.widget-social a,.widget-social a:visited{padding:0 3px;color:#222222;color:rgba(34,34,34,0.77)}
-             */
-        }
-    }
-};
+  /**
+   * Watches for changes and automatically performs a given task depending on the type of file changed.
+   * @param {function} [done] - An automatically assigned and invoked callback to signal asynchronous completion (do not use!)
+   */
+  watch(done) {
+    gulp.watch(path.join(gulpOptions.styles.path.scss, '/**/*.scss'), this.styles);
+    gulp.watch(path.join(gulpOptions.html.src, `/**/*${gulpOptions.html.ext}`), gulp.series(this.reload));
+    gulp.watch(path.join(gulpOptions.js.src, '**/*.js'), gulp.series(this.scripts, this.reload));
+    done();
+  }
+
+  /**
+   *      ========= "Utility" classes start =========
+   */
 
 
-gulp.task("serve", gulp.series(nm, bs, gulp.parallel(scripts, styles), watch));
+  /**
+   *      ========= BrowserSync =========
+   */
 
-function bs(cb) {
-    browserSync({
-        proxy: "http://localhost:" + options.app.port,
-        port: options.app["bs-port"],
-        notify: true
+  /**
+   * Starts the browsersync proxy server
+   * @param {function} [done] - An automatically assigned and invoked callback to signal asynchronius completion (do not use!)
+   */
+  startBrowserSync(done) {
+    setTimeout(() => {
+      gulpPlugins.browserSync.init(gulpOptions.app.browserSync);
+      done();
+    }, 1000);
+  }
+
+  /**
+   * Reloads the whole page via browsersync
+   * @param {function} [done] - An automatically assigned and invoked callback to signal asynchronius completion (do not use!)
+   */
+  reload(done) {
+    gulpPlugins.browserSync.reload();
+    done();
+  }
+
+
+  /**
+   *      ======== Nodemon ========
+   */
+
+  /**
+   * Initializes a nodemon server
+   * @param {function} [done] - An automatically assigned and invoked callback to signal asynchronous completion (do not use!)
+   */
+  server(done) {
+    const _this = this;
+    let called = false;
+    const server = gulpPlugins.nodemon(gulpOptions.app.nodemon);
+
+    server.on('start', () => {
+      if (!called) {
+        called = true;
+        done();
+      }
     });
-    cb();
-};
-function nm(cb) {
-    var called = false;
-    var server = nodemon(options.app.nodemonOptions);
-    server.on('start', function () {
-        if (!called) {
-            called = true;
-            cb();
-        }
+
+    server.on('restart', () => {
+      console.log(chalk.green(dedent(`
+            * 
+            *   Retarting nodemon server...
+            *
+            `)));
+      gulp.series(_this.reload);
     });
-    server.on('restart', function () {
-        console.log('restarted!');
-        //TODO: is this delay needed?
-        setTimeout(function () {
-            reload({stream: false});
-        }, 1000);
+
+    server.on('crash', () => {
+      console.log(chalk.green(dedent(`
+            * 
+            *   Nodemon server crashed! Restarting in 5 seconds...
+            *
+            `)));
+      server.emit('restart', 5); // restart the server in 5 seconds
     });
-    server.on('crash', function () {
-        console.error('Application has crashed!\n');
-        server.emit('restart', 5);  // restart the server in 5 seconds
-    });
-    //server.once('quit', function () {
-    //    // handle ctrl+c without a big weep
-    //    process.exit();
-    //});
-    return server;
-};
+  }
 
-function styles(cb) {
-    gulp.src([path.join(options.styles.path.scss, '/**/*.scss')])
-        .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(sass(options.styles.sassOptions).on('error', sass.logError))
-        .pipe(autoprefixer({browsers: options.styles.autoprefixerCompatibility}))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(options.styles.path.css))
-        //.pipe(browserSync.reload({stream:true})) --- ERR: reloads whole page because of the .map files
-        .pipe(browserSync.stream({match: '**/*.css'}));
-    cb();
-};
+  /**
+   *      ======== Misc ========
+   */
 
-function scripts() {
-    return gulp.src([path.join(options.js.path, options.js.es6dir, options.js.entryFile)])
-        .pipe(plumber())
-        .pipe(webpack(require('./webpack.config.js'), require("webpack")))
-        .pipe(gulp.dest(options.js.path));
-};
-
-
-gulp.task("default", gulp.parallel("serve"));
-
-/**
- * HELPER TASKS
- **/
-
-function watch(cb) {
-    gulp.watch([path.join(options.styles.path.scss, '/**/*.scss')], gulp.parallel(styles));
-    gulp.watch([path.join(options.html.path, '/**/*' + options.html.ext)], gulp.parallel(bsReload));
-    gulp.watch([path.join(options.js.path, options.js.es6dir, '/**/*.js')], gulp.series(scripts, bsReload));
-    cb();
+  /**
+   * cleans the dist directory
+   */
+  clean(done) {
+    del.sync('dist');
+    done();
+  }
 }
 
-function bsReload(cb) {
-    reload();
-    cb();
-};
+/**
+ *      Let's get the party started!
+ *      Don't forget to have fun on this new project! (✿ ◕ ‿ ◕)ᓄ ╰U╯
+ */
+gulp.registry(new Flow());
